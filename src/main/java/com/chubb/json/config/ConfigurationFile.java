@@ -12,6 +12,8 @@ public class ConfigurationFile
 	String imageExtension;
 	String imageLocation;
 	String pdfLocation;
+	String dateFormat;
+	String currentDateTime;
 	
 	public String getApplication() {
 		return application;
@@ -91,5 +93,21 @@ public class ConfigurationFile
 	
 	public void setPdfLocation(String pdfLocation) {
 		this.pdfLocation = pdfLocation;
-	}		
+	}
+
+	public String getDateFormat() {
+		return dateFormat;
+	}
+
+	public void setDateFormat(String dateFormat) {
+		this.dateFormat = dateFormat;
+	}
+
+	public String getCurrentDateTime() {
+		return currentDateTime;
+	}
+
+	public void setCurrentDateTime(String currentDateTime) {
+		this.currentDateTime = currentDateTime;
+	}			
 }

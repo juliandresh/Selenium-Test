@@ -12,6 +12,8 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 
+import com.chubb.json.config.ConfigurationFile;
+
 
 public class ScreenShot {
 	
@@ -25,17 +27,20 @@ public class ScreenShot {
 	 * @param extensionFile: Extensión de la imagen (.jpg, .gif, .bpm)
 	 * @throws Exception: Posible excepción si no se encuentra la ruta
 	 */
-	public void screenCapture(WebDriver driver, String path, String fileName, String extensionFile)
+	public void screenCapture(WebDriver driver, ConfigurationFile configFile)
 	{		
 		//Crear un formato de fecha
-		String timeStamp = new SimpleDateFormat("_yyyyMMdd_HHmmss").format(new Date());
-
+		String timeStamp = new SimpleDateFormat(configFile.getDateFormat()).format(new Date());			
+				
 		//Creación del directorio y el nombre del ScreenShot
 		StringBuffer builderPath = new StringBuffer();
-		builderPath.append(path);
-		builderPath.append(fileName);
+		builderPath.append(configFile.getImageLocation());
+		builderPath.append("//");
+		builderPath.append(configFile.getCurrentDateTime());
+		builderPath.append("//");
+		builderPath.append(configFile.getApplication());
 		builderPath.append(timeStamp);
-		builderPath.append(extensionFile);		
+		builderPath.append(configFile.getImageExtension());		
 				
 		String filePath = builderPath.toString();		
 		

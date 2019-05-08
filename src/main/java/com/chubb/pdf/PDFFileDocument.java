@@ -8,6 +8,8 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Table;
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 
@@ -17,7 +19,8 @@ public class PDFFileDocument
 
 	public void manipulatePdf(ConfigurationFile configFile) throws Exception 
 	{
-		String pdfLocation = configFile.getPdfLocation() + configFile.getApplication() + ".pdf";		
+		String timeStamp = new SimpleDateFormat(configFile.getDateFormat()).format(new Date());
+		String pdfLocation = configFile.getPdfLocation() + timeStamp + "//" +configFile.getApplication() + ".pdf";		
 		
     	File file = new File(pdfLocation);
         file.getParentFile().mkdirs();
@@ -30,6 +33,7 @@ public class PDFFileDocument
         for (String screenShotfile : screenShotList) {        	
         	System.out.println("PDF: " + screenShotfile);
         	table.addCell(new Image(ImageDataFactory.create(screenShotfile)).setAutoScale(true));
+        	Thread.sleep(3000);
 		}
         table.addCell("END OF DOCUMENT");
         doc.add(table);

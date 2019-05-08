@@ -41,8 +41,7 @@
 	    <groupId>com.assertthat</groupId>
 	    <artifactId>selenium-shutterbug</artifactId>
 	    <version>0.9</version>
-	</dependency>
-    
+	</dependency>    
         
 	<!-- https://mvnrepository.com/artifact/org.json/json -->
 	<dependency>
@@ -50,13 +49,19 @@
 	    <artifactId>json</artifactId>
 	    <version>20180813</version>
 	</dependency>
-    
+            
+    	
+	<dependency>
+       <groupId>org.slf4j</groupId>
+       <artifactId>slf4j-api</artifactId>
+       <version>1.7.5</version>
+    </dependency>
+
     <dependency>
-    	<groupId>org.slf4j</groupId>
-    	<artifactId>slf4j-api</artifactId>
-    	<version>1.7.25</version>
-    </dependency>    
-        
+       <groupId>org.slf4j</groupId>
+       <artifactId>slf4j-log4j12</artifactId>
+       <version>1.7.5</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -66,7 +71,7 @@
 	      <configuration>
 	        <archive>
 	          <manifest>
-	            <mainClass>com.chubb.main</mainClass>
+	            <mainClass>com.chubb.main.Main</mainClass>
 	          </manifest>
 	        </archive>
 	        <descriptorRefs>

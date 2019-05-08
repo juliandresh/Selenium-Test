@@ -44,6 +44,7 @@ public class ConfigJSON
 	        configFile.setImageExtension(config.getString("imageExtension"));
 	        configFile.setImageLocation(config.getString("imageLocation"));
 	        configFile.setPdfLocation(config.getString("pdfLocation"));	      
+	        configFile.setDateFormat(config.getString("dateFormat"));
 	        	        
 		} 
     	catch (FileNotFoundException e) 

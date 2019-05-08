@@ -1,7 +1,10 @@
 package com.chubb.main;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
+import com.chubb.dashboard.OperativeProcess;
 import com.chubb.json.config.ConfigJSON;
 import com.chubb.json.config.ConfigurationFile;
 import com.chubb.pdf.PDFFileDocument;
@@ -10,10 +13,13 @@ import com.chubb.selenium.applications.MarineTest;
 public class Main {
 
 	public static void main(String[] args) {
+				
 		ConfigJSON json = new ConfigJSON();
 		ConfigurationFile configFile = json.getConfigurationFile();
-		System.out.println(configFile.getWeburl());
+		String timeStamp = new SimpleDateFormat(configFile.getDateFormat()).format(new Date());
+		configFile.setCurrentDateTime(timeStamp);
 
+		OperativeProcess operative = new OperativeProcess();
 		
 		//Iniciar Prueba a Sitio Web con Selenium
 		MarineTest marine = new MarineTest();
