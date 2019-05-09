@@ -18,14 +18,13 @@ public class Main {
 		ConfigurationFile configFile = json.getConfigurationFile();
 		String timeStamp = new SimpleDateFormat(configFile.getDateFormat()).format(new Date());
 		configFile.setCurrentDateTime(timeStamp);
-
-		OperativeProcess operative = new OperativeProcess();
+		
 		
 		//Iniciar Prueba a Sitio Web con Selenium
 		MarineTest marine = new MarineTest();
 		marine.setConfigFile(configFile);
 		marine.startTest();
-			
+		
 		//Creación de Archivo PDF
 		PDFFileDocument pdfFileDocument = new PDFFileDocument();
 		//Obtener Listado de ScreenShots generados

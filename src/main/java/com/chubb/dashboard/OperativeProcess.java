@@ -10,7 +10,8 @@ import com.chubb.json.config.ConfigurationFile;
 public class OperativeProcess {
 	
 	boolean ulrStatus;
-	boolean authentication;
+	boolean login;
+	
 	Map<String, Boolean> process = new HashMap<String, Boolean>();
 	
 	
@@ -35,19 +36,18 @@ public class OperativeProcess {
 		return ulrStatus;
 	}
 
-
 	public void setUlrStatus(boolean ulrStatus) {
 		this.ulrStatus = ulrStatus;
 	}
 
-
-	public boolean isAuthentication() {
-		return authentication;
+	
+	public boolean isLogin() {
+		return login;
 	}
 
 
-	public void setAuthentication(boolean authentication) {
-		this.authentication = authentication;
+	public void setLogin(boolean login) {
+		this.login = login;
 	}
 
 
