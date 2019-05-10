@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import com.chubb.dashboard.OperativeProcess;
+import com.chubb.dashboard.DashboardList;
 import com.chubb.json.config.ConfigJSON;
 import com.chubb.json.config.ConfigurationFile;
 import com.chubb.pdf.PDFFileDocument;
@@ -17,16 +17,17 @@ public class Main {
 		ConfigJSON json = new ConfigJSON();
 		ConfigurationFile configFile = json.getConfigurationFile();
 		String timeStamp = new SimpleDateFormat(configFile.getDateFormat()).format(new Date());
+		MarineTest marine = new MarineTest();
+		DashboardList dashboard = new DashboardList();
+		PDFFileDocument pdfFileDocument = new PDFFileDocument();
 		configFile.setCurrentDateTime(timeStamp);
 		
 		
-		//Iniciar Prueba a Sitio Web con Selenium
-		MarineTest marine = new MarineTest();
+		//Iniciar Prueba a Sitio Web con Selenium		
 		marine.setConfigFile(configFile);
+		marine.setDashboard(dashboard);
 		marine.startTest();
-		
-		//Creación de Archivo PDF
-		PDFFileDocument pdfFileDocument = new PDFFileDocument();
+				
 		//Obtener Listado de ScreenShots generados
 		List<String> listadoArchivos = marine.getListado();
 		//Enviar listado de ScreenShots a modulo de PDF 
@@ -35,12 +36,19 @@ public class Main {
 		try 
 		{	
 			//Crear archivo PDF con listado de imagenes
-			pdfFileDocument.manipulatePdf(configFile);
+			pdfFileDocument.createPdfDocument(configFile);			
 		} 
 		catch (Exception e1) 
 		{		
 			e1.printStackTrace();
 		}
+							
+		dashboard.createJSONFile(marine.getDashboard());
+		/*List<Result> listResult = marine.getDashboard().getListResult();
+		for (Result result : listResult) {
+			System.out.println(result.getFunctionality() + "-" + result.getAction() + "-" + result.isStatus() + "-" + result.getMessage());
+		}*/
+		//Crear PDF TABLERO
 
 	}
 
