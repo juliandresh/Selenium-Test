@@ -49,8 +49,7 @@ public class PDFFileDocument
         tableDashboard.setWidthPercent(70);
         tableDashboard.addCell("");
         tableDashboard.addCell("");
-        tableDashboard.addCell("");
-        tableDashboard.addCell("");
+
         doc.add(tableDashboard);
         doc.close();
         System.out.println("DONE");
