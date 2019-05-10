@@ -1,9 +1,7 @@
 package com.chubb.selenium.applications;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -12,7 +10,8 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 
-import com.chubb.dashboard.OperativeProcess;
+import com.chubb.dashboard.DashboardList;
+import com.chubb.dashboard.Result;
 import com.chubb.json.config.ConfigurationFile;
 import com.chubb.screenshot.ScreenShot;
 
@@ -21,7 +20,9 @@ public class MarineTest {
 	
 	List<String> listado = new ArrayList<String>();		
 	ConfigurationFile configFile;
-	OperativeProcess process = new OperativeProcess();
+	DashboardList dashboardList;
+	Result result;
+	String nameofCurrMethod = null;
 		
 	public List<String> getListado() {
 		return listado;
@@ -37,15 +38,24 @@ public class MarineTest {
 
 	public void setConfigFile(ConfigurationFile configFile) {
 		this.configFile = configFile;
+	}		
+
+	public DashboardList getDashboard() {
+		return dashboardList;
+	}
+
+	public void setDashboard(DashboardList dashboardList) {
+		this.dashboardList = dashboardList;
 	}
 
 	public void startTest()
-	{								
+	{					
 		// Optional, if not specified, WebDriver will search your path for chromedriver.
 		System.setProperty(configFile.getWebdriver(), configFile.getDriverPath());
 		WebDriver driver = new ChromeDriver();
-		ScreenShot screenShot = new ScreenShot();
-		  
+		ScreenShot screenShot = new ScreenShot();		
+		List<Result> listResult = new ArrayList<Result>();
+		dashboardList.setListResult(listResult);  
 		try 
 		{
 		  driver.manage().window().maximize();
@@ -54,14 +64,15 @@ public class MarineTest {
 		  
 		  //Validar si la página cargó correctamente
 		  
-		  if(isPageOK(driver)) {			  
-			  process.setUlrStatus(true);
-			  takeScreenShot(driver, screenShot);
+		  if(isPageValidationOK(driver)) 
+		  {			  
+			  takeScreenShot(driver, screenShot);			  
+			  addResult2List("Load Page", nameofCurrMethod, true, "ok");
 			  Thread.sleep(3000);
 		  }
 		  else 
 		  { 
-			  process.setUlrStatus(false);
+			  addResult2List("Load Page", nameofCurrMethod, false, "wrong");			  
 			  //sendEmail();
 			  //WriteLog();			  
 			  driver.close();
@@ -71,59 +82,18 @@ public class MarineTest {
 		//Validar si usuario autenticó correctamente
 		  if(isLoginOK(driver))
 		  {
-			process.setLogin(true);
+			addResult2List("Login", nameofCurrMethod, true, "ok");			
 			takeScreenShot(driver, screenShot);
 			Thread.sleep(3000);
 		  }
 		  else {
-			process.setLogin(true);
+			addResult2List("Login", nameofCurrMethod, false, "wrong");
 			//sendEmail();
 			  //WriteLog();			  
 			  driver.close();
-			  System.exit(0);
-			  System.err.println("Usuario o Password invalido");
+			  System.exit(0);			  
 		  }
 		  getConsultaPolizaOK(driver, screenShot);
-		  /*
-		  if(getConsultaPolizaOK(driver, screenShot))
-		  {
-			  
-		  }
-		  
-		  
-		  WebElement rootMenu = driver.findElement(By.xpath(" //div[@id='el3']"));
-		  
-		  Actions action = new Actions(driver);
-		  action.moveToElement(rootMenu).perform();
-		  Thread.sleep(1000);
-		  
-		  //inside sub-menu click on 'Consultar Pólizas'
-		  action.moveToElement(driver.findElement(By.linkText("Consultar Pólizas"))).click().perform();			
-		  Thread.sleep(3000);
-		  takeScreenShot(driver, screenShot);
-		  
-		  Select dropdown = new Select(driver.findElement(By.name("M")));
-		  dropdown.selectByValue("1");
-		  String polizaTest= "0506512";
-		  WebElement polN = driver.findElement(By.name("PolN"));
-		  polN.sendKeys(polizaTest);
-		  takeScreenShot(driver, screenShot);
-		  polN.submit();
-		  
-		  driver.findElement(By.linkText(polizaTest)).click();			  
-		  String var = String.valueOf(driver.findElement(By.xpath("//td[contains(text(),'"+ polizaTest +"')]")).getText());
-		  
-		  var = var.substring(8, 15);
-		  if (polizaTest.equals(var))
-		  {				  
-			  takeScreenShot(driver, screenShot);
-			  System.out.println("DONE");
-		  }
-		  Thread.sleep(3000);
-		  WebElement rootMenu1 = driver.findElement(By.xpath("//div[@id='el5']"));
-		  rootMenu1.click();
-		  
-		  Thread.sleep(3000);*/
 		  driver.quit();
 		}
 		catch (Exception e) 
@@ -133,9 +103,11 @@ public class MarineTest {
 		listado = screenShot.getScreenShotList();
 	}
 	
-	public boolean isPageOK(WebDriver driver)
+	
+	public boolean isPageValidationOK(WebDriver driver)
 	{
 		boolean validation = false;
+		nameofCurrMethod = new Exception().getStackTrace()[0].getMethodName();
 		String elemento = driver.findElement(By.xpath("//span[@class='ace']")).getText();
 		System.out.println(elemento);
 		if(elemento.equals("Chubb Latinoamérica - Software de Marine")) {
@@ -148,9 +120,11 @@ public class MarineTest {
 		return validation;
 	}
 	
+	
 	public boolean isLoginOK(WebDriver driver) 
 	{
 		boolean validation = false;
+		nameofCurrMethod = new Exception().getStackTrace()[0].getMethodName();
 		driver.findElement(By.linkText("Colombia")).click();		
 		WebElement usuario = driver.findElement(By.name("Usuario"));
 		usuario.sendKeys(configFile.getUser());
@@ -171,6 +145,7 @@ public class MarineTest {
 	{		
 		try 
 		{			
+			nameofCurrMethod = new Exception().getStackTrace()[0].getMethodName();
 			WebElement rootMenu = driver.findElement(By.xpath(" //div[@id='el3']"));
 			Actions action = new Actions(driver);
 			action.moveToElement(rootMenu).perform();
@@ -222,4 +197,16 @@ public class MarineTest {
 			
 		}
 	}	
+	
+	private Result addResult2List(String functionality, String action, boolean status, String message) {
+		Result result = new Result();
+		result.setFunctionality(functionality);
+		result.setAction(action);
+		result.setStatus(status);
+		result.setMessage(message);
+		System.out.println(result.getFunctionality() + result.getMessage() +result.isStatus());
+		dashboardList.addResult(result);
+		
+		return result;
+	}
 }
