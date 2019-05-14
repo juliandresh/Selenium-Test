@@ -1,15 +1,16 @@
-package com.chubb.selenium.applications;
+	package com.chubb.selenium.applications;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
-
 import com.chubb.dashboard.DashboardList;
 import com.chubb.dashboard.Result;
 import com.chubb.json.config.ConfigurationFile;
@@ -17,6 +18,7 @@ import com.chubb.screenshot.ScreenShot;
 
 
 public class MarineTest {
+	private static Logger LOG = LogManager.getLogger(MarineTest.class);
 	
 	List<String> listado = new ArrayList<String>();		
 	ConfigurationFile configFile;
@@ -59,37 +61,35 @@ public class MarineTest {
 		try 
 		{
 		  driver.manage().window().maximize();
-		  driver.get(configFile.getWeburl());		  		  		  
-		  
-		  
-		  //Validar si la página cargó correctamente
-		  
-		  if(isPageValidationOK(driver)) 
+
+		  //Validar si la página cargó correctamente	
+		  Status status = isPageLoadOK(driver); 		  
+		  if(status.isValidation()) 
 		  {			  
 			  takeScreenShot(driver, screenShot);			  
-			  addResult2List("Load Page", nameofCurrMethod, true, "ok");
+			  addResult2List("Load Page", status.isValidation(), status.getMessage(), status.getException());
+			  status = null;
 			  Thread.sleep(3000);
 		  }
 		  else 
-		  { 
-			  addResult2List("Load Page", nameofCurrMethod, false, "wrong");			  
-			  //sendEmail();
-			  //WriteLog();			  
+		  {
+			  addResult2List("Load Page", status.isValidation(), status.getMessage(), status.getException());		  			 			 
+			  //sendEmail();			  			  		  
 			  driver.close();
 			  System.exit(0);
 		  }
-		  
+		  		  
 		//Validar si usuario autenticó correctamente
-		  if(isLoginOK(driver))
+		  status = isLoginOK(driver); 
+		  if(status.isValidation())
 		  {
-			addResult2List("Login", nameofCurrMethod, true, "ok");			
+			addResult2List("Login", status.isValidation(), status.getMessage(), status.getException() );			
 			takeScreenShot(driver, screenShot);
 			Thread.sleep(3000);
 		  }
 		  else {
-			addResult2List("Login", nameofCurrMethod, false, "wrong");
-			//sendEmail();
-			  //WriteLog();			  
+			  addResult2List("Login", status.isValidation(), status.getMessage(), status.getException());
+			  //sendEmail();			  			  
 			  driver.close();
 			  System.exit(0);			  
 		  }
@@ -104,48 +104,77 @@ public class MarineTest {
 	}
 	
 	
-	public boolean isPageValidationOK(WebDriver driver)
-	{
-		boolean validation = false;
+	public Status isPageLoadOK(WebDriver driver)
+	{		
+		Status status = new Status();
 		nameofCurrMethod = new Exception().getStackTrace()[0].getMethodName();
-		String elemento = driver.findElement(By.xpath("//span[@class='ace']")).getText();
-		System.out.println(elemento);
-		if(elemento.equals("Chubb Latinoamérica - Software de Marine")) {
-			validation = true; 
-		}
-		else 
+		try 
 		{
-			validation = false;
-		}		  		
-		return validation;
-	}
-	
-	
-	public boolean isLoginOK(WebDriver driver) 
-	{
-		boolean validation = false;
-		nameofCurrMethod = new Exception().getStackTrace()[0].getMethodName();
-		driver.findElement(By.linkText("Colombia")).click();		
-		WebElement usuario = driver.findElement(By.name("Usuario"));
-		usuario.sendKeys(configFile.getUser());
-		WebElement password = driver.findElement(By.name("Pass"));
-		password.sendKeys(configFile.getPassword());
-		password.submit();
-		String elemento = driver.findElement(By.xpath("//a[@class='Inicio']")).getText();
-		if(elemento.equals("Inicio")) {
-			validation = true;
+			driver.get(configFile.getWeburl());
+			String elemento = driver.findElement(By.xpath("//span[@class='ace']")).getText();
+			if(elemento.equals("Chubb Latinoamérica - Software de Marine")) {
+				status.setValidation(true);
+				status.setMessage("Elemento encontrado: " + elemento + ". Página carga correctamente");
+				LOG.info(status.getMessage());
+			}
+			else 
+			{
+				status.setValidation(false);
+				status.setMessage("Por favor validar la etiqueta de comparación para esta prueba");
+				LOG.error(status.getMessage());
+				
+			}		  	
 		}
-		else {
-			validation = false;
-		}					
-		return validation;
+		catch (NoSuchElementException e) {
+			status.setValidation(false);			
+			status.setMessage("URL no alcanzable. Por favor validar conectividad al url "+configFile.getWeburl()+ " desde el sitio de prueba");
+			status.setException(e.getMessage());
+			LOG.fatal(status.getMessage());
+			LOG.fatal("Excepción capturada: " + e.getMessage());
+			return status;
+		}		
+		return status;
+	}	
+	
+	public Status isLoginOK(WebDriver driver) 
+	{
+		Status status = new Status();		
+		nameofCurrMethod = new Exception().getStackTrace()[0].getMethodName();
+		try {
+			driver.findElement(By.linkText("Colombia")).click();		
+			WebElement usuario = driver.findElement(By.name("Usuario"));
+			usuario.sendKeys(configFile.getUser());
+			WebElement password = driver.findElement(By.name("Pass"));
+			password.sendKeys(configFile.getPassword());
+			password.submit();
+			String elemento = driver.findElement(By.xpath("//a[@class='Inicio ']")).getText();
+			if(elemento.equals("Inicio")) {				
+				status.setValidation(true);
+				status.setMessage("La prueba supero la fase de login");
+				LOG.info(status.getMessage());
+			}
+			else {
+				status.setValidation(false);
+				status.setMessage("La prueba generó un error al hacer Login");
+				LOG.info(status.getMessage());
+			}
+		}
+		catch (NoSuchElementException e) {
+			status.setValidation(false);			
+			status.setMessage("Error al hacer login en URL seleccionado.");
+			status.setException(e.getMessage());
+			LOG.fatal(status.getMessage());
+			LOG.fatal("Excepción capturada: " + e.getMessage());
+			return status;
+		}
+							
+		return status;
 	}
 	
 	public void getConsultaPolizaOK(WebDriver driver, ScreenShot screenShot)
 	{		
 		try 
 		{			
-			nameofCurrMethod = new Exception().getStackTrace()[0].getMethodName();
 			WebElement rootMenu = driver.findElement(By.xpath(" //div[@id='el3']"));
 			Actions action = new Actions(driver);
 			action.moveToElement(rootMenu).perform();
@@ -177,8 +206,7 @@ public class MarineTest {
 			Thread.sleep(3000);
 			WebElement rootMenu1 = driver.findElement(By.xpath("//div[@id='el5']"));
 			rootMenu1.click();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+		} catch (InterruptedException e) {			
 			e.printStackTrace();
 		}
 		  			
@@ -198,13 +226,13 @@ public class MarineTest {
 		}
 	}	
 	
-	private Result addResult2List(String functionality, String action, boolean status, String message) {
+	private Result addResult2List(String functionality, boolean status, String message, String exception) {
 		Result result = new Result();
-		result.setFunctionality(functionality);
-		result.setAction(action);
+		result.setFunctionality(functionality);		
 		result.setStatus(status);
 		result.setMessage(message);
-		System.out.println(result.getFunctionality() + result.getMessage() +result.isStatus());
+		result.setException(exception);
+		System.out.println(result.getMessage());
 		dashboardList.addResult(result);
 		
 		return result;

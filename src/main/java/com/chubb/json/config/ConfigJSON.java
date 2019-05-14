@@ -17,7 +17,7 @@ public class ConfigJSON
     	try 
     	{ 
     		//Obtener path actual
-    		Path path = Paths.get( System.getProperty("user.dir"));        
+    		Path path = Paths.get(System.getProperty("user.dir"));        
     	
     		//Construir path para arhivo de configuración
     		StringBuffer configPath = new StringBuffer();

@@ -5,15 +5,16 @@ public class ConfigurationFile
 	String application;
 	String webdriver;
 	String driverPath;
+	String pdfLocation;
+	String dateFormat;
+	String imageLocation;
+	String screenShotName;
+	String imageExtension;
 	String weburl;
 	String user;
 	String password;
-	String screenShotName;
-	String imageExtension;
-	String imageLocation;
-	String pdfLocation;
-	String dateFormat;
 	String currentDateTime;
+
 	
 	public String getApplication() {
 		return application;

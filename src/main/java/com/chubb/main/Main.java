@@ -5,10 +5,12 @@ import java.util.Date;
 import java.util.List;
 
 import com.chubb.dashboard.DashboardList;
+import com.chubb.dashboard.Result;
 import com.chubb.json.config.ConfigJSON;
 import com.chubb.json.config.ConfigurationFile;
 import com.chubb.pdf.PDFFileDocument;
 import com.chubb.selenium.applications.MarineTest;
+
 
 public class Main {
 
@@ -28,14 +30,17 @@ public class Main {
 		marine.setDashboard(dashboard);
 		marine.startTest();
 				
-		//Obtener Listado de ScreenShots generados
-		List<String> listadoArchivos = marine.getListado();
-		//Enviar listado de ScreenShots a modulo de PDF 
+		//Obtener Listado de ScreenShots generados a la clase PDFFileDocument
+		List<String> listadoArchivos = marine.getListado();				
 		pdfFileDocument.setScreenShotList(listadoArchivos);
+		
+		//Obtener Listado de Resultados
+		List<Result> listResult = marine.getDashboard().getListResult();
+		pdfFileDocument.setListResult(listResult);
 		
 		try 
 		{	
-			//Crear archivo PDF con listado de imagenes
+			//Crear archivo PDF con listado de imagenes y dashboard de estados
 			pdfFileDocument.createPdfDocument(configFile);			
 		} 
 		catch (Exception e1) 

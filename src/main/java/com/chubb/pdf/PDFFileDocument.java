@@ -1,5 +1,6 @@
 package com.chubb.pdf;
 
+import com.chubb.dashboard.Result;
 import com.chubb.json.config.ConfigurationFile;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;
@@ -18,6 +19,7 @@ import java.util.List;
 public class PDFFileDocument 
 {
 	List<String> screenShotList;
+	List<Result> listResult;
 
 	public void createPdfDocument(ConfigurationFile configFile) throws Exception 
 	{
@@ -29,6 +31,21 @@ public class PDFFileDocument
         PdfDocument pdfDoc = new PdfDocument(new PdfWriter(pdfLocation));
         Document doc = new Document(pdfDoc);
 
+        Paragraph paragraph = new Paragraph();
+        paragraph.add("\n");
+        paragraph.add("TABLERO DE RESULTADOS");
+        doc.add(paragraph);
+        
+        Table tableDashboard = new Table(2);
+        tableDashboard.setWidthPercent(70);
+        //for (Result result : listResult) {
+        //	tableDashboard.addCell(result.getFunctionality());
+		//}
+        tableDashboard.addCell("");
+        tableDashboard.addCell("");
+
+        doc.add(tableDashboard);
+        
         Table tableScreenShot = new Table(1);
         tableScreenShot.setWidthPercent(100);
         
@@ -40,17 +57,7 @@ public class PDFFileDocument
         tableScreenShot.addCell("END OF DOCUMENT");
         doc.add(tableScreenShot);
         
-        Paragraph paragraph = new Paragraph();
-        paragraph.add("\n");
-        paragraph.add("TABLERO DE RESULTADOS");
-        doc.add(paragraph);
         
-        Table tableDashboard = new Table(2);
-        tableDashboard.setWidthPercent(70);
-        tableDashboard.addCell("");
-        tableDashboard.addCell("");
-
-        doc.add(tableDashboard);
         doc.close();
         System.out.println("DONE");
     }
@@ -61,7 +68,14 @@ public class PDFFileDocument
 
 	public void setScreenShotList(List<String> screenShotList) {
 		this.screenShotList = screenShotList;
+	}
+
+	public List<Result> getListResult() {
+		return listResult;
+	}
+
+	public void setListResult(List<Result> listResult) {
+		this.listResult = listResult;
 	}      
-	
 	
 }

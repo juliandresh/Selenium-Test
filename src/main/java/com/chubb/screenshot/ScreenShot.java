@@ -38,7 +38,7 @@ public class ScreenShot {
 		builderPath.append("//");
 		builderPath.append(configFile.getCurrentDateTime());
 		builderPath.append("//");
-		builderPath.append(configFile.getApplication());
+		builderPath.append(configFile.getScreenShotName());
 		builderPath.append(timeStamp);
 		builderPath.append(configFile.getImageExtension());		
 				
