@@ -76,6 +76,7 @@ public class MarineTest {
 			  addResult2List("Load Page", status.isValidation(), status.getMessage(), status.getException());		  			 			 
 			  //sendEmail();			  			  		  
 			  driver.close();
+			  driver.quit();
 			  System.exit(0);
 		  }
 		  		  
@@ -85,15 +86,28 @@ public class MarineTest {
 		  {
 			addResult2List("Login", status.isValidation(), status.getMessage(), status.getException() );			
 			takeScreenShot(driver, screenShot);
+			status = null;
 			Thread.sleep(3000);
 		  }
 		  else {
 			  addResult2List("Login", status.isValidation(), status.getMessage(), status.getException());
-			  //sendEmail();			  			  
+			  //sendEmail();
+			  
 			  driver.close();
+			  driver.quit();
 			  System.exit(0);			  
 		  }
-		  getConsultaPolizaOK(driver, screenShot);
+		  
+		  //Validar consulta de poliza
+		  status = getConsultaPolizaOK(driver, screenShot); 
+		  if(status.isValidation()) {
+			  addResult2List("Consulta Póliza", status.isValidation(), status.getMessage(), status.getException() );
+		  }
+		  else {
+			  addResult2List("Consulta Póliza", status.isValidation(), status.getMessage(), status.getException() );
+			  driver.close();
+			  driver.quit();			  
+		  }
 		  driver.quit();
 		}
 		catch (Exception e) 
@@ -147,8 +161,8 @@ public class MarineTest {
 			WebElement password = driver.findElement(By.name("Pass"));
 			password.sendKeys(configFile.getPassword());
 			password.submit();
-			String elemento = driver.findElement(By.xpath("//a[@class='Inicio ']")).getText();
-			if(elemento.equals("Inicio")) {				
+			String elemento = driver.findElement(By.xpath("//h3[contains(text(),'CHUBB MARINE Latinoamérica')]")).getText();
+			if(elemento.equals("CHUBB MARINE Latinoamérica")) {				
 				status.setValidation(true);
 				status.setMessage("La prueba supero la fase de login");
 				LOG.info(status.getMessage());
@@ -156,7 +170,7 @@ public class MarineTest {
 			else {
 				status.setValidation(false);
 				status.setMessage("La prueba generó un error al hacer Login");
-				LOG.info(status.getMessage());
+				LOG.error(status.getMessage());
 			}
 		}
 		catch (NoSuchElementException e) {
@@ -171,10 +185,11 @@ public class MarineTest {
 		return status;
 	}
 	
-	public void getConsultaPolizaOK(WebDriver driver, ScreenShot screenShot)
+	public Status getConsultaPolizaOK(WebDriver driver, ScreenShot screenShot)
 	{		
+		Status status = new Status();
 		try 
-		{			
+		{						
 			WebElement rootMenu = driver.findElement(By.xpath(" //div[@id='el3']"));
 			Actions action = new Actions(driver);
 			action.moveToElement(rootMenu).perform();
@@ -188,7 +203,7 @@ public class MarineTest {
 			  
 			Select dropdown = new Select(driver.findElement(By.name("M")));
 			dropdown.selectByValue("1");
-			String polizaTest= "0506512";
+			String polizaTest= "050651233";
 			WebElement polN = driver.findElement(By.name("PolN"));
 			polN.sendKeys(polizaTest);
 			takeScreenShot(driver, screenShot);
@@ -202,6 +217,16 @@ public class MarineTest {
 			{
 				takeScreenShot(driver, screenShot);
 				System.out.println("DONE");
+				
+				status.setValidation(true);
+				status.setMessage("Módulo de Consulta funcionando correctamente.");
+				LOG.info(status.getMessage());				
+			}
+			else {
+				takeScreenShot(driver, screenShot);
+				status.setValidation(false);
+				status.setMessage("Póliza no encontrada.");
+				LOG.info(status.getMessage());
 			}
 			Thread.sleep(3000);
 			WebElement rootMenu1 = driver.findElement(By.xpath("//div[@id='el5']"));
@@ -209,6 +234,14 @@ public class MarineTest {
 		} catch (InterruptedException e) {			
 			e.printStackTrace();
 		}
+		catch(NoSuchElementException ex) {
+			status.setValidation(false);
+			status.setMessage("Excepcion: Póliza no encontrada.");
+			status.setException(ex.getMessage());
+			LOG.fatal(status.getMessage());
+			return status;
+		}
+		return status;
 		  			
 	}
 	
